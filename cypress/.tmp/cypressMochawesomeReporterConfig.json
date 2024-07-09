@@ -1,0 +1,13 @@
+{
+  "jsonDir": "/Volumes/Ali/Raju/cypress-boiler-plate/cypress/reports/html/.jsons",
+  "reporterOptions": {
+    "cypressParallel": true,
+    "reportDir": "/Volumes/Ali/Raju/cypress-boiler-plate/cypress/reports/html",
+    "overwrite": false
+  },
+  "screenshotsDir": "/Volumes/Ali/Raju/cypress-boiler-plate/cypress/screenshots",
+  "videosFolder": "/Volumes/Ali/Raju/cypress-boiler-plate/cypress/videos",
+  "outputDir": "/Volumes/Ali/Raju/cypress-boiler-plate/cypress/reports/html",
+  "configOutput": "cypress/.tmp/cypressMochawesomeReporterConfig.json",
+  "removeJsonsFolderAfterMerge": false
+}

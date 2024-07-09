@@ -1,0 +1,10 @@
+{
+  "suites": 1,
+  "tests": 5,
+  "passes": 1,
+  "pending": 0,
+  "failures": 4,
+  "start": "2024-07-09T13:56:11.807Z",
+  "duration": 190015,
+  "file": "cypress/e2e/login.spec.ts"
+}

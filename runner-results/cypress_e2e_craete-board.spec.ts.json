@@ -1,0 +1,10 @@
+{
+  "suites": 1,
+  "tests": 1,
+  "passes": 0,
+  "pending": 0,
+  "failures": 1,
+  "start": "2024-07-09T13:56:11.800Z",
+  "duration": 9071,
+  "file": "cypress/e2e/craete-board.spec.ts"
+}

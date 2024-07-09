@@ -1,0 +1,17 @@
+{
+  "default": "local",
+  "local": {
+    "baseUrl": "http://localhost:3000",
+    "apiUrl": "http://localhost:3000/api",
+    "apiKey": "local-api-key",
+    "loginEmail": "abc@abc.com",
+    "loginPassword": "p123!"
+  },
+  "dev": {
+    "baseUrl": "http://dev.example.com",
+    "apiUrl": "http://dev.example.com/api",
+    "apiKey": "dev-api-key",
+    "loginEmail": "dev@example.com",
+    "loginPassword": "p123!"
+  }
+}
