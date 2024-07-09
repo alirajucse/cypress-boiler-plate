@@ -4,14 +4,14 @@
     "baseUrl": "http://localhost:3000",
     "apiUrl": "http://localhost:3000/api",
     "apiKey": "local-api-key",
-    "loginEmail": "abc@abc.com",
-    "loginPassword": "p123!"
+    "loginEmail": "your email",
+    "loginPassword": "your password!"
   },
   "dev": {
     "baseUrl": "http://dev.example.com",
     "apiUrl": "http://dev.example.com/api",
     "apiKey": "dev-api-key",
-    "loginEmail": "dev@example.com",
-    "loginPassword": "p123!"
+    "loginEmail": "your email",
+    "loginPassword": "your password!"
   }
 }
