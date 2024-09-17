@@ -3,19 +3,19 @@ Cypress.Commands.add("initializeTest", () => {
 });
 
 Cypress.Commands.add("Login", () => {
-  const email = Cypress.env("loginEmail");
+  const username = Cypress.env("userName");
   const password = Cypress.env("loginPassword");
 
   // Use cy.session to cache the login state
-  cy.session([email, password], () => {
+  cy.session([username, password], () => {
     // If the user is not logged in, log them in
-    cy.visit(Cypress.env("baseUrl") + "/auth/login");
+    cy.visit(Cypress.env("baseUrl") + "/parabank/index.htm");
     // Wait for the page to load and elements to become visible
-    cy.get(".px-2:nth-child(3)").should("exist").type(email); // replace with correct selector
-    cy.get(".px-2:nth-child(5)").should("exist").type(password); // replace with correct selector
-    cy.get(".py-2").should("exist").click(); // replace with your login button selector
+    cy.get(".login:nth-child(2) > .input").should("exist").type(username); // replace with correct selector
+    cy.get(".login:nth-child(4) > .input").should("exist").type(password); // replace with correct selector
+    cy.get(".button:nth-child(1)").should("exist").click(); // replace with your login button selector
 
     // Verify login was successful
-    cy.url().should("not.include", "/login");
+    cy.url().should("not.include", "/index.htm");
   });
 });
