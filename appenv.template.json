@@ -3,22 +3,22 @@
   "local": {
     "baseUrl": "http://localhost:3000",
     "apiUrl": "http://localhost:3000/api",
-    "apiKey": "local-api-key",
-    "userName": "your username",
-    "loginPassword": "your password!"
+    "apiKey": "YOUR_LOCAL_API_KEY",
+    "userName": "YOUR_USERNAME",
+    "loginPassword": "YOUR_PASSWORD"
   },
   "dev": {
     "baseUrl": "http://dev.example.com",
     "apiUrl": "http://dev.example.com/api",
-    "apiKey": "dev-api-key",
-    "userName": "your username",
-    "loginPassword": "your password!"
+    "apiKey": "YOUR_DEV_API_KEY",
+    "userName": "YOUR_USERNAME",
+    "loginPassword": "YOUR_PASSWORD"
   },
   "prod": {
     "baseUrl": "https://parabank.parasoft.com/",
     "apiUrl": "http://dev.example.com/api",
-    "apiKey": "prod-api-key",
-    "userName": "rajusdet1",
-    "loginPassword": "p123456789"
+    "apiKey": "YOUR_PROD_API_KEY",
+    "userName": "YOUR_USERNAME",
+    "loginPassword": "YOUR_PASSWORD"
   }
 }
