@@ -10,7 +10,7 @@ pipeline {
     }
     
     environment {
-        NODE_VERSION = '23.7.0'
+        NODE_VERSION = '18.7.0'
         APPENV = "${params.APPENV}"
     }
     
