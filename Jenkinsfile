@@ -11,60 +11,98 @@ pipeline {
     
     environment {
         NODE_VERSION = '23.7.0'
-        // Make APPENV available to all stages
         APPENV = "${params.APPENV}"
     }
+    
     options {
+        // These options help with Stage View visualization
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timestamps()
         ansiColor('xterm')
+        skipDefaultCheckout()  // We'll handle checkout explicitly
+        disableConcurrentBuilds()
     }
+    
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/alirajucse/cypress-boiler-plate.git'
+                // Clean workspace before checkout
+                cleanWs()
+                checkout scm
             }
         }
-        stage('Install Dependencies') {
+        
+        stage('Setup') {
             steps {
                 script {
-                   sh 'npm install'
+                    echo "Setting up environment: ${APPENV}"
+                    sh 'npm install'
                 }
             }
         }
-        stage('Clean Reports') {
+        
+        stage('Prepare Test Run') {
             steps {
                 script {
                     sh 'npm run clean'
                 }
             }
         }
-        stage('Run Cypress Tests in Parallel') {
+        
+        stage('Execute Tests') {
             steps {
                 script {
-                    sh 'npm run cy:run:parallel'
+                    try {
+                        sh 'npm run cy:run:parallel'
+                    } catch (err) {
+                        echo "Test execution completed with some failures"
+                        currentBuild.result = 'UNSTABLE'
+                    }
                 }
             }
         }
-        stage('Generate Mochawesome Report') {
+        
+        stage('Generate Reports') {
             steps {
                 script {
                     sh 'npm run generate-report'
                 }
             }
         }
+        
+        stage('Publish Results') {
+            steps {
+                script {
+                    archiveArtifacts artifacts: 'cypress/reports/**/*', allowEmptyArchive: true
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'cypress/reports',
+                        reportFiles: 'mochawesome.html',
+                        reportName: "Cypress Test Report - ${APPENV}"
+                    ])
+                }
+            }
+        }
     }
+    
     post {
         always {
-            script {
-                archiveArtifacts artifacts: 'cypress/reports/**/*', allowEmptyArchive: true
-            }
-            publishHTML([
-                reportDir: 'cypress/reports',
-                reportFiles: 'mochawesome.html',
-                reportName: 'Cypress Test Report'
-            ])
+            // Clean workspace after build
+            cleanWs()
         }
+        
+        success {
+            echo 'All stages completed successfully!'
+        }
+        
+        unstable {
+            echo 'Test execution completed with some failures. Check the report for details.'
+        }
+        
         failure {
-            echo 'Tests failed! Check the Mochawesome report for details.'
+            echo 'Pipeline failed! Check the logs and report for details.'
         }
     }
 }
