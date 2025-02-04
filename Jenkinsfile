@@ -15,7 +15,6 @@ pipeline {
     }
     
     options {
-        // These options help with Stage View visualization
         buildDiscarder(logRotator(numToKeepStr: '10'))
         timestamps()
         ansiColor('xterm')
@@ -53,7 +52,11 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'npm run cy:run:parallel'
+                        // Debugging: Print environment variables
+                        sh 'printenv | grep APPENV'
+                        
+                        // Run Cypress tests in parallel
+                        sh 'export APPENV="${APPENV}" && npm run cy:run:parallel'
                     } catch (err) {
                         echo "Test execution completed with some failures"
                         currentBuild.result = 'UNSTABLE'
