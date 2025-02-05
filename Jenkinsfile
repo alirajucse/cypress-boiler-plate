@@ -10,7 +10,6 @@ pipeline {
     }
     
     environment {
-        echo "Node.js version: ${NODE_VERSION}"
         APPENV = "${params.APPENV}"
     }
     
