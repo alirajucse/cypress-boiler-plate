@@ -34,7 +34,12 @@ pipeline {
             steps {
                 script {
                     echo "Setting up environment: ${APPENV}"
-                    sh 'npm install'
+                    sh '''#!/bin/bash
+                    export NVM_DIR="$HOME/.nvm"
+                    source $NVM_DIR/nvm.sh
+                    nvm use 18
+                    npm install
+                    '''
                 }
             }
         }
