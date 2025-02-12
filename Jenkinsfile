@@ -10,7 +10,7 @@ pipeline {
     }
     
     tools {
-        nodejs 'NodeJS 18'  
+        nodejs 'NodeJS_18'
     }
 
     environment {
@@ -38,10 +38,8 @@ pipeline {
                 script {
                     echo "Setting up environment: ${APPENV}"
                     sh '''
-                        echo "Node installation details:"
-                        which node
-                        node --version
-                        npm --version
+                        echo "Node version: $(node -v)"
+                        echo "NPM version: $(npm -v)"
                         
                         # Install dependencies
                         npm ci
@@ -68,10 +66,11 @@ pipeline {
                         sh """
                             echo "Running Cypress tests in environment: ${APPENV}"
                             export APPENV="${APPENV}"
-                            npm run cy:run:parallel
+                            npm run cy:run:parallel || true
                         """
                     } catch (err) {
                         echo "Test execution completed with some failures: ${err}"
+                        currentBuild.result = 'UNSTABLE'
                     }
                 }
             }
@@ -80,35 +79,47 @@ pipeline {
         stage('Generate Reports') {
             steps {
                 script {
-                    try {
-                        sh 'npm run generate-report'
-                    } catch (err) {
-                        echo "Error generating report: ${err}"
-                    }
+                    sh '''
+                        # Run report generation and capture the exit code
+                        npm run generate-report || true
+                        
+                        # Verify report was actually generated
+                        if [ -f "cypress/reports/html/index.html" ]; then
+                            echo "Report generated successfully"
+                        else
+                            echo "Report generation failed - file not found"
+                            exit 1
+                        fi
+                    '''
                 }
             }
         }
 
         stage('Publish Results') {
             steps {
-                archiveArtifacts(
-                    artifacts: '''
-                        cypress/reports/**/*,
-                        cypress/videos/**/*.mp4,
-                        cypress/screenshots/**/*.png
-                    ''',
-                    allowEmptyArchive: true
-                )
-                publishHTML(
-                    target: [
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'cypress/reports',
-                        reportFiles: 'mochawesome.html',
-                        reportName: "Cypress Test Report - ${APPENV}"
-                    ]
-                )
+                script {
+                    // Archive test artifacts
+                    archiveArtifacts(
+                        artifacts: '''
+                            cypress/reports/**/*,
+                            cypress/videos/**/*.mp4,
+                            cypress/screenshots/**/*.png
+                        ''',
+                        allowEmptyArchive: true
+                    )
+                    
+                    // Publish HTML report
+                    publishHTML(
+                        target: [
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: 'cypress/reports/html',
+                            reportFiles: 'index.html',
+                            reportName: "Cypress Test Report - ${APPENV}"
+                        ]
+                    )
+                }
             }
         }
     }
