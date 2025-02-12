@@ -10,6 +10,7 @@ pipeline {
     }
 
     environment {
+        PATH = "/bin:/usr/bin:/usr/local/bin:${PATH}"
         APPENV = "${params.APPENV}"
     }
 
@@ -34,20 +35,20 @@ pipeline {
                 script {
                     echo "Setting up environment: ${APPENV}"
                     withEnv(['PATH+NODE=$HOME/.nvm/versions/node/v18.17.0/bin']) {
-                sh '''
-                echo "Debugging Environment Variables"
-                echo "NVM_DIR=$NVM_DIR"
-                echo "Node version: $(node -v)"     
-                echo "NPM version: $(npm -v)"
-                echo "Node location: $(which node)"
-                echo "NPM location: $(which npm)"
+                        sh '''
+                        echo "Debugging Environment Variables"
+                        echo "NVM_DIR=$NVM_DIR"
+                        echo "Node version: $(node -v)"
+                        echo "NPM version: $(npm -v)"
+                        echo "Node location: $(which node)"
+                        echo "NPM location: $(which npm)"
 
-                export NVM_DIR="$HOME/.nvm"
-                source $NVM_DIR/nvm.sh
-                nvm use 18
-                node -v
-                npm install
-                '''
+                        export NVM_DIR="$HOME/.nvm"
+                        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load nvm
+                        nvm use 18 || nvm install 18  # Use Node 18 or install it if not available
+                        node -v
+                        npm install
+                        '''
                     }
                 }
             }
@@ -65,9 +66,10 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh '''#!/bin/bash -e
+                        sh '''
                         echo "Running Cypress tests in environment: $APPENV"
-                        export APPENV="${APPENV}" && npm run cy:run:parallel
+                        export APPENV="${APPENV}"
+                        npm run cy:run:parallel
                         '''
                     } catch (err) {
                         echo "Test execution completed with some failures"
