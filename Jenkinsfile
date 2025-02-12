@@ -38,8 +38,10 @@ pipeline {
                 script {
                     echo "Setting up environment: ${APPENV}"
                     sh '''
-                        echo "Node version: $(node -v)"
-                        echo "NPM version: $(npm -v)"
+                        echo "Node installation details:"
+                        which node
+                        node --version
+                        npm --version
                         
                         # Install dependencies
                         npm ci
