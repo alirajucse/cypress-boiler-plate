@@ -33,9 +33,22 @@ pipeline {
             steps {
                 script {
                     echo "Setting up environment: ${APPENV}"
-                    sh '''#!/bin/bash -e
-                    npm install
-                    '''
+                    withEnv(['PATH+NODE=$HOME/.nvm/versions/node/v18.17.0/bin']) {
+                sh '''
+                echo "Debugging Environment Variables"
+                echo "NVM_DIR=$NVM_DIR"
+                echo "Node version: $(node -v)"     
+                echo "NPM version: $(npm -v)"
+                echo "Node location: $(which node)"
+                echo "NPM location: $(which npm)"
+
+                export NVM_DIR="$HOME/.nvm"
+                source $NVM_DIR/nvm.sh
+                nvm use 18
+                node -v
+                npm install
+                '''
+                    }
                 }
             }
         }
