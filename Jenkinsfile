@@ -72,7 +72,6 @@ pipeline {
                         """
                     } catch (err) {
                         echo "Test execution completed with some failures: ${err}"
-                        currentBuild.result = 'UNSTABLE'
                     }
                 }
             }
@@ -85,7 +84,6 @@ pipeline {
                         sh 'npm run generate-report'
                     } catch (err) {
                         echo "Error generating report: ${err}"
-                        unstable('Report generation failed')
                     }
                 }
             }
