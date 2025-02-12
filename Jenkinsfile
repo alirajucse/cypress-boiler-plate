@@ -8,9 +8,12 @@ pipeline {
             description: 'Select the environment to run tests against'
         )
     }
+    
+    tools {
+        nodejs 'NodeJS 18'  
+    }
 
     environment {
-        PATH = "/bin:/usr/bin:/usr/local/bin:${PATH}"
         APPENV = "${params.APPENV}"
     }
 
@@ -34,22 +37,13 @@ pipeline {
             steps {
                 script {
                     echo "Setting up environment: ${APPENV}"
-                    withEnv(['PATH+NODE=$HOME/.nvm/versions/node/v18.17.0/bin']) {
-                        sh '''
-                        echo "Debugging Environment Variables"
-                        echo "NVM_DIR=$NVM_DIR"
+                    sh '''
                         echo "Node version: $(node -v)"
                         echo "NPM version: $(npm -v)"
-                        echo "Node location: $(which node)"
-                        echo "NPM location: $(which npm)"
-
-                        export NVM_DIR="$HOME/.nvm"
-                        [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh"  # Load nvm
-                        nvm use 18 || nvm install 18  # Use Node 18 or install it if not available
-                        node -v
-                        npm install
-                        '''
-                    }
+                        
+                        # Install dependencies
+                        npm ci
+                    '''
                 }
             }
         }
@@ -57,7 +51,10 @@ pipeline {
         stage('Prepare Test Run') {
             steps {
                 script {
-                    sh 'npm run clean'
+                    sh '''
+                        echo "Cleaning previous reports"
+                        npm run clean
+                    '''
                 }
             }
         }
@@ -66,13 +63,13 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh '''
-                        echo "Running Cypress tests in environment: $APPENV"
-                        export APPENV="${APPENV}"
-                        npm run cy:run:parallel
-                        '''
+                        sh """
+                            echo "Running Cypress tests in environment: ${APPENV}"
+                            export APPENV="${APPENV}"
+                            npm run cy:run:parallel
+                        """
                     } catch (err) {
-                        echo "Test execution completed with some failures"
+                        echo "Test execution completed with some failures: ${err}"
                         currentBuild.result = 'UNSTABLE'
                     }
                 }
@@ -82,22 +79,36 @@ pipeline {
         stage('Generate Reports') {
             steps {
                 script {
-                    sh 'npm run generate-report'
+                    try {
+                        sh 'npm run generate-report'
+                    } catch (err) {
+                        echo "Error generating report: ${err}"
+                        unstable('Report generation failed')
+                    }
                 }
             }
         }
 
         stage('Publish Results') {
             steps {
-                archiveArtifacts artifacts: 'cypress/reports/**/*', allowEmptyArchive: true
-                publishHTML([
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'cypress/reports',
-                    reportFiles: 'mochawesome.html',
-                    reportName: "Cypress Test Report - ${APPENV}"
-                ])
+                archiveArtifacts(
+                    artifacts: '''
+                        cypress/reports/**/*,
+                        cypress/videos/**/*.mp4,
+                        cypress/screenshots/**/*.png
+                    ''',
+                    allowEmptyArchive: true
+                )
+                publishHTML(
+                    target: [
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'cypress/reports',
+                        reportFiles: 'mochawesome.html',
+                        reportName: "Cypress Test Report - ${APPENV}"
+                    ]
+                )
             }
         }
     }
