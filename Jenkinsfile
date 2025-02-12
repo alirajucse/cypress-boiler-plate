@@ -44,7 +44,7 @@ pipeline {
                         echo "NPM location: $(which npm)"
 
                         export NVM_DIR="$HOME/.nvm"
-                        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load nvm
+                        [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh"  # Load nvm
                         nvm use 18 || nvm install 18  # Use Node 18 or install it if not available
                         node -v
                         npm install
