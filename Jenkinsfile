@@ -10,7 +10,7 @@ pipeline {
     }
     
     tools {
-        nodejs 'NodeJS_18'
+        nodejs 'NodeJS 18'
     }
 
     environment {
