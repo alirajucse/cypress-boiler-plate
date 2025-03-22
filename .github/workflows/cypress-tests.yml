@@ -57,7 +57,3 @@ jobs:
         with:
           name: test-reports
           path: cypress/reports/html
-
-      - name: Debug Report Files (Optional)
-        if: always()
-        run: ls -R cypress/reports/html
