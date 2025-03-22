@@ -13,13 +13,16 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: "npm"
+
+      - name: Clear NPM Cache (Optional)
+        run: npm cache clean --force
 
       - name: Install Dependencies
         run: npm ci
@@ -28,15 +31,15 @@ jobs:
         run: npx cypress run --browser chrome
 
       - name: Upload Cypress Screenshots
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots
           path: cypress/screenshots
 
       - name: Upload Cypress Videos
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-videos
           path: cypress/videos
@@ -49,8 +52,8 @@ jobs:
           npx marge cypress/reports/html/report.json --reportDir cypress/reports/html || echo "Report generation failed"
 
       - name: Upload Test Reports
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: test-reports
           path: cypress/reports/html
