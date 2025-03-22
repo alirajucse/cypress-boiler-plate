@@ -21,22 +21,40 @@ jobs:
           node-version: "18"
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
 
-      - name: Run Cypress tests with parallel execution
-        run: npm test
+      - name: Run Cypress Tests on Chrome
+        run: npx cypress run --browser chrome
 
-      - name: Upload Cypress screenshots
+      - name: Upload Cypress Screenshots
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots
-          path: cypress/reports/html/screenshots
+          path: cypress/screenshots
+
+      - name: Upload Cypress Videos
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-videos
+          path: cypress/videos
+
+      - name: Generate Mochawesome Report
+        if: always()
+        run: |
+          mkdir -p cypress/reports/html
+          npx mochawesome-merge cypress/reports/html/.jsons/*.json > cypress/reports/html/report.json || echo "JSON merge failed"
+          npx marge cypress/reports/html/report.json --reportDir cypress/reports/html || echo "Report generation failed"
 
       - name: Upload Test Reports
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: test-reports
           path: cypress/reports/html
+
+      - name: Debug Report Files (Optional)
+        if: always()
+        run: ls -R cypress/reports/html
